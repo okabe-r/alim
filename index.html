@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متتبع التقدم</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="https://i.postimg.cc/47szXgWh/image.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/47szXgWh/image.png">
+    <meta name="theme-color" content="#f0f4f8">
+    <style>
+        /* --- General Styles & Variables --- */
+        :root {
+            --bg-color: #f0f4f8;
+            --card-color: #ffffff;
+            --primary-text-color: #2a3a4a;
+            --secondary-text-color: #8c96a3;
+            --border-color: #e9eef5;
+            --danger-color: #e74c3c;
+            --accent-color: #27b3a5;
+            --tab-bg-color: #e9eef5;
+            --tab-active-text-color: #0d6efd;
+            --progress-bar-bg: #e9ecef;
+            --progress-bar-fill: #adb5bd;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- Header & Tabs --- */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        
+        header p {
+            color: var(--secondary-text-color);
+            margin-top: 5px;
+            font-size: 1rem;
+        }
+        
+        .controls-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            flex-grow: 1;
+            background-color: var(--tab-bg-color);
+            border-radius: 12px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 15px;
+            background: none;
+            border: none;
+            color: var(--secondary-text-color);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            color: var(--primary-text-color);
+        }
+        
+        .tab-btn.active {
+            color: var(--tab-active-text-color);
+            background-color: var(--card-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+        }
+        
+        .control-btn {
+            background: var(--tab-bg-color);
+            border: none;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            color: var(--secondary-text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .control-btn:hover {
+            background-color: #dce3ec;
+        }
+        .control-btn.active {
+            color: var(--tab-active-text-color);
+            background-color: transparent;
+            box-shadow: none;
+        }
+        .control-btn.active:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        .control-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        #filter-btn svg path {
+            transition: fill 0.2s ease-in-out;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+        #filter-btn.active svg path {
+            fill: currentColor;
+        }
+        #sort-btn svg path {
+             fill: currentColor;
+        }
+
+
+        /* --- Subject List & Cards --- */
+        #subjects-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .subject-card {
+            background-color: var(--card-color);
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .subject-card:hover {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            padding-left: 10px;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-actions button {
+            background: none;
+            border: none;
+            color: var(--secondary-text-color);
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .card-actions button:hover {
+            color: var(--primary-text-color);
+        }
+        
+        .card-actions button svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .card-actions button svg path {
+            fill: currentColor;
+        }
+        
+        .pin-btn.pinned {
+            color: var(--tab-active-text-color);
+        }
+
+        .progress-bar-container {
+            background-color: var(--progress-bar-bg);
+            border-radius: 20px;
+            height: 8px;
+            overflow: hidden;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(to right, #2ECFB9, #5B9CF7);
+            height: 100%;
+            width: 0;
+            border-radius: 20px;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .progress-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--secondary-text-color);
+        }
+
+        /* --- Empty State --- */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary-text-color);
+            background-color: var(--card-color);
+            border-radius: 12px;
+        }
+
+        .empty-state p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background-color: var(--tab-active-text-color);
+            color: #fff;
+        }
+        
+        .btn-secondary {
+            background-color: var(--tab-bg-color);
+            color: var(--primary-text-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: #fff;
+        }
+
+        #add-subject-btn {
+            display: none; /* Hidden to match provided image */
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: #fff;
+            font-size: 2rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        #add-subject-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s, align-items 0.3s;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: var(--primary-text-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--secondary-text-color);
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--primary-text-color);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Progress Update Modal Specifics */
+        .progress-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        .progress-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background-color: var(--tab-bg-color);
+            color: var(--primary-text-color);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding-bottom: 4px; /* Optical alignment */
+            transition: background-color 0.2s;
+        }
+        .progress-btn:hover {
+            background-color: #dce3ec;
+        }
+
+        .progress-input {
+            width: 120px;
+            height: 60px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-text-color);
+            border: none;
+            background: transparent;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        .progress-input::-webkit-outer-spin-button,
+        .progress-input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        .progress-total-display {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--secondary-text-color);
+            margin-bottom: 20px;
+        }
+
+        /* Filter & Sort Modal Specifics */
+        .filter-section, .sort-section {
+            margin-bottom: 20px;
+        }
+        .filter-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--primary-text-color);
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .filter-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--tab-active-text-color);
+        }
+        .filter-option label {
+            cursor: pointer;
+        }
+        
+        .sort-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .sort-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sort-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--tab-active-text-color);
+        }
+        .sort-option label {
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+            header h1 {
+                font-size: 2.2rem;
+            }
+            .tab-btn {
+                font-size: 0.85rem;
+                padding: 10px 8px;
+            }
+            .control-btn {
+                font-size: 0.9rem;
+            }
+            .controls-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            .action-buttons {
+                justify-content: flex-end;
+            }
+
+            /* Replaced keyboard handling to use transform.
+               This prevents layout shifts that could cause the modal to
+               close unexpectedly on browsers like Chrome mobile. */
+            .modal-overlay.keyboard-active .modal-content {
+                transform: scale(1) translateY(-100px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>متتبع التقدم</h1>
+            <p>تقدمك، محفوظ على جهازك.</p>
+        </header>
+
+        <div class="controls-container">
+            <div class="tabs">
+                <button data-stage="preparatory" class="tab-btn">التمهيدية</button>
+                <button data-stage="first" class="tab-btn">الأولى</button>
+                <button data-stage="second" class="tab-btn">الثانية</button>
+                <button data-stage="third" class="tab-btn active">الثالثة</button>
+            </div>
+            <div class="action-buttons">
+                <button id="copy-btn" class="control-btn" title="نسخ التقدم">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                </button>
+                <button id="sort-btn" class="control-btn" title="فرز">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
+                    </svg>
+                </button>
+                <button id="filter-btn" class="control-btn" title="تصفية">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M3 4H21L14 12V18L10 20V12L3 4Z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+
+        <div id="subjects-list">
+            <!-- Subject cards will be injected here by JavaScript -->
+        </div>
+        
+    </div>
+
+    <button id="add-subject-btn" title="إضافة مادة جديدة">+</button>
+
+    <!-- Modals -->
+
+    <!-- Add/Edit Subject Modal -->
+    <div id="add-edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modal-title">إضافة مادة جديدة</h2>
+            <form id="add-edit-form">
+                <div class="form-group">
+                    <label for="subject-name">اسم المادة</label>
+                    <input type="text" id="subject-name" required placeholder="مثال: شرح نخبة الفكر">
+                </div>
+                <div class="form-group">
+                    <label for="subject-total">إجمالي الوحدات</label>
+                    <input type="number" id="subject-total" required min="1" placeholder="مثال: 6">
+                </div>
+                <div class="form-group">
+                    <label for="subject-unit">اسم الوحدة</label>
+                    <input type="text" id="subject-unit" required placeholder="مثال: درس">
+                </div>
+                <div class="form-group">
+                    <label for="subject-department">قسم المادة</label>
+                    <select id="subject-department" required>
+                        <option value="sharia">القسم الشرعي</option>
+                        <option value="reform">قسم المنهج الإصلاحي/الثقافي</option>
+                        <option value="spiritual">القسم التزكوي</option>
+                        <option value="review">قسم المراجعة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="subject-type">نوع المادة</label>
+                    <select id="subject-type" required>
+                        <option value="video">مرئي/مسموع</option>
+                        <option value="read">مقروء</option>
+                        <option value="memo">محفوظ</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-danger" id="delete-subject-btn">حذف</button>
+                    <button type="button" class="btn btn-secondary" data-close>إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Update Progress Modal -->
+    <div id="update-progress-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="update-modal-title">تحديث التقدم</h2>
+            <form id="update-progress-form">
+                <div class="progress-input-container">
+                    <button type="button" class="progress-btn" id="decrement-progress-btn">-</button>
+                    <input type="number" id="progress-input" class="progress-input" min="0">
+                    <button type="button" class="progress-btn" id="increment-progress-btn">+</button>
+                </div>
+                <p id="progress-total-display" class="progress-total-display">/ 0 درس</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-close>إغلاق</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Filter Modal -->
+    <div id="filter-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>تصفية المواد</h2>
+            <form id="filter-form">
+                <div class="filter-section">
+                    <h3>حسب قسم المادة</h3>
+                    <div class="filter-options">
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-dep-sharia" value="sharia" checked>
+                            <label for="filter-dep-sharia">القسم الشرعي</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-dep-reform" value="reform" checked>
+                            <label for="filter-dep-reform">قسم المنهج الإصلاحي/الثقافي</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-dep-spiritual" value="spiritual" checked>
+                            <label for="filter-dep-spiritual">القسم التزكوي</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-dep-review" value="review" checked>
+                            <label for="filter-dep-review">قسم المراجعة</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>حسب نوع المادة</h3>
+                    <div class="filter-options">
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-type-video" value="video" checked>
+                            <label for="filter-type-video">مرئي/مسموع</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-type-read" value="read" checked>
+                            <label for="filter-type-read">مقروء</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-type-memo" value="memo" checked>
+                            <label for="filter-type-memo">محفوظ</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>حسب إكمال المادة</h3>
+                    <div class="filter-options">
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-comp-completed" value="completed" checked>
+                            <label for="filter-comp-completed">أكملتها</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-comp-in-progress" value="in_progress" checked>
+                            <label for="filter-comp-in-progress">لم أكملها بعد</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="filter-comp-not-started" value="not_started" checked>
+                            <label for="filter-comp-not-started">لم أبدأ بها بعد</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="reset-filters-btn">إعادة تعيين</button>
+                    <button type="button" class="btn btn-secondary" id="deselect-all-filters-btn">إلغاء تحديد الكل</button>
+                    <button type="submit" class="btn btn-primary">تطبيق</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sort Modal -->
+    <div id="sort-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>فرز المواد</h2>
+            <form id="sort-form">
+                <div class="sort-section">
+                    <div class="sort-options">
+                        <div class="sort-option">
+                            <input type="radio" id="sort-alphabetical" name="sort-method" value="alphabetical" checked>
+                            <label for="sort-alphabetical">أبجديًا</label>
+                        </div>
+                        <div class="sort-option">
+                            <input type="radio" id="sort-last-modified" name="sort-method" value="last_modified">
+                            <label for="sort-last-modified">آخر تعديل (للتقدم)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-close>إلغاء</button>
+                    <button type="submit" class="btn btn-primary">تطبيق</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Copy Progress Modal -->
+    <div id="copy-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>نسخ التقدم</h2>
+            <p style="margin-bottom: 20px; color: var(--secondary-text-color);">سيتم تضمين المواد قيد التنفيذ تلقائيًا. حدد أدناه لتضمين الفئات الأخرى.</p>
+            <form id="copy-form">
+                <div class="filter-section" style="margin-bottom: 10px;">
+                     <div class="filter-options" style="display: flex; flex-direction: column; gap: 15px; grid-template-columns: 1fr;">
+                        <div class="filter-option">
+                            <input type="checkbox" id="copy-include-completed" value="completed">
+                            <label for="copy-include-completed">أكملتها</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="copy-include-not-started" value="not_started">
+                            <label for="copy-include-not-started">لم أبدأ بها بعد</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-close>إلغاء</button>
+                    <button type="submit" id="copy-to-clipboard-btn" class="btn btn-primary">نسخ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>تأكيد الحذف</h2>
+            <p>هل أنت متأكد من أنك تريد حذف هذه المادة؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="confirm-cancel-btn">إلغاء</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">نعم، احذف</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const subjectsList = document.getElementById('subjects-list');
+            const addSubjectBtn = document.getElementById('add-subject-btn');
+            
+            // Views & Controls
+            const tabsContainer = document.querySelector('.tabs');
+            const filterBtn = document.getElementById('filter-btn');
+            const sortBtn = document.getElementById('sort-btn');
+            const copyBtn = document.getElementById('copy-btn');
+
+            // Modals
+            const addEditModal = document.getElementById('add-edit-modal');
+            const updateProgressModal = document.getElementById('update-progress-modal');
+            const filterModal = document.getElementById('filter-modal');
+            const sortModal = document.getElementById('sort-modal');
+            const confirmModal = document.getElementById('confirm-modal');
+            const copyModal = document.getElementById('copy-modal');
+            
+            // Forms & Inputs
+            const addEditForm = document.getElementById('add-edit-form');
+            const modalTitle = document.getElementById('modal-title');
+            const subjectNameInput = document.getElementById('subject-name');
+            const subjectTotalInput = document.getElementById('subject-total');
+            const subjectUnitInput = document.getElementById('subject-unit');
+            const subjectDepartmentInput = document.getElementById('subject-department');
+            const subjectTypeInput = document.getElementById('subject-type');
+            const deleteSubjectBtn = document.getElementById('delete-subject-btn');
+            
+            const updateProgressForm = document.getElementById('update-progress-form');
+            const updateModalTitle = document.getElementById('update-modal-title');
+            const progressInput = document.getElementById('progress-input');
+            const incrementProgressBtn = document.getElementById('increment-progress-btn');
+            const decrementProgressBtn = document.getElementById('decrement-progress-btn');
+            const progressTotalDisplay = document.getElementById('progress-total-display');
+            
+            const filterForm = document.getElementById('filter-form');
+            const resetFiltersBtn = document.getElementById('reset-filters-btn');
+            const deselectAllFiltersBtn = document.getElementById('deselect-all-filters-btn');
+
+            const sortForm = document.getElementById('sort-form');
+
+            const copyForm = document.getElementById('copy-form');
+            const copyIncludeCompleted = document.getElementById('copy-include-completed');
+            const copyIncludeNotStarted = document.getElementById('copy-include-not-started');
+            const copyToClipboardBtn = document.getElementById('copy-to-clipboard-btn');
+            
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+
+
+            // --- State ---
+            let allSubjects = { preparatory: [], first: [], second: [], third: [] };
+            let currentStage = 'third';
+            let editingSubjectId = null;
+            let subjectToDeleteId = null;
+            let progressInputValueBeforeFocus = null;
+
+            const STAGES = ['preparatory', 'first', 'second', 'third'];
+            const defaultFilters = {
+                departments: ['sharia', 'reform', 'spiritual', 'review'],
+                types: ['video', 'read', 'memo'],
+                completion: ['completed', 'in_progress', 'not_started']
+            };
+            const defaultSort = 'alphabetical';
+            
+            let filters = {};
+            let sortMethod = {};
+
+            STAGES.forEach(stage => {
+                filters[stage] = JSON.parse(JSON.stringify(defaultFilters));
+                sortMethod[stage] = defaultSort;
+            });
+
+            // --- Initial Data ---
+            const createInitialSubject = (subject, index) => ({
+                ...subject,
+                id: Date.now() + index,
+                completed: 0,
+                pinned: false,
+                lastUpdated: Date.now() + index,
+            });
+
+            const initialSubjectsPreparatory = [
+                { name: 'كتاب «مختصر جامع العلوم والحكم»', total: 240, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'كتاب «المختصر في السيرة النبوية»', total: 680, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'سلسلة «المدخل إلى اللغة العربية»', total: 4, unit: 'مجالس', department: 'sharia', type: 'video' },
+                { name: 'سلسلة «المدخل إلى الفقه الإسلامي»', total: 14, unit: 'مجلس', department: 'sharia', type: 'video' },
+                { name: 'سلسلة «مداخل العلوم»', total: 7, unit: 'مجالس', department: 'sharia', type: 'video' },
+                { name: 'سلسلة «شرح المنهاج من ميراث النبوة»', total: 31, unit: 'مجلسًا', department: 'sharia', type: 'video' },
+                { name: 'حفظ «الأربعين النووية»', total: 50, unit: 'حديثًا', department: 'sharia', type: 'memo' },
+                { name: 'حفظ «المنهاج من ميراث النبوة»', total: 197, unit: 'حديثًا', department: 'sharia', type: 'memo' },
+                { name: 'حفظ «الأرجوزة الميئية»', total: 100, unit: 'بيت', department: 'sharia', type: 'memo' },
+                { name: 'كتاب «تفسير السعدي»', total: 48, unit: 'سورة', department: 'spiritual', type: 'read' },
+                { name: 'كتاب «معالم في طريق طلب العلم»', total: 330, unit: 'صفحة', department: 'spiritual', type: 'read' },
+                { name: 'محاضرة «مهارات القراءة»', total: 1, unit: 'محاضرة', department: 'spiritual', type: 'video' },
+                { name: 'كتاب «أعمال القلوب»', total: 443, unit: 'صفحة', department: 'spiritual', type: 'read' },
+                { name: 'كتاب «مفسدات القلوب»', total: 364, unit: 'صفحة', department: 'spiritual', type: 'read' },
+                { name: 'مجالس الاستهداء بالقرآن', total: 4, unit: 'مجالس', department: 'spiritual', type: 'video' }
+            ].map((s, i) => createInitialSubject(s, i));
+
+            const initialSubjectsSecond = [
+                // Sharia
+                { name: 'المحاضرة الأولى من «الشرح المطول على نزهة النظر»', total: 1, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'سلسلة «المداخل الأولية إلى علم الحديث»', total: 2, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'محاضرة «التأسيس الحديثي»', total: 1, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'الشرح القديم على البيقونية', total: 5, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'سلسلة «شرح نخبة الفكر»', total: 6, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'حفظ «عمدة الأحكام»', total: 241, unit: 'صفحة', department: 'sharia', type: 'memo' },
+                { name: 'كتاب «المدخل إلى علم الحديث»', total: 214, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'سلسلة «شرح نظم المعين على فهم تطبيقات المحدثين»', total: 7, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'سلسلة «مدخل إلى فقه الحديث»', total: 3, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'سلسلة «غيث الساري من هدايات البخاري»', total: 26, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'كتاب «الفكر المنجي عند المحدثين»', total: 178, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'محاضرة «المنهج الحديثي بين المتقدمين والمتأخرين»', total: 1, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'كتاب «مناهج المحدثين»', total: 259, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'كتاب «أفي السنة شك»', total: 93, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'حفظ نظم «المعين على فهم تطبيقات المحدثين»', total: 153, unit: 'بيت', department: 'sharia', type: 'memo' },
+                { name: 'كتاب «شرح منظومة لغة المحدث»', total: 469, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'الشرح الجديد على البيقونية', total: 2, unit: 'درسان', department: 'sharia', type: 'video' },
+                // Reform
+                { name: 'سلسلة «الحملة البريطانية على مصر»', total: 60, unit: 'درس', department: 'reform', type: 'video' },
+                { name: 'سلسلة «جرعة وعي إلى الجيل الصاعد»', total: 3, unit: 'درس', department: 'reform', type: 'video' },
+                { name: 'سلسلة «مصادر التلقي والمعرفة»', total: 7, unit: 'درس', department: 'reform', type: 'video' },
+                { name: 'سلسلة «إحياء منهاج النبوة»', total: 6, unit: 'درس', department: 'reform', type: 'video' },
+                // Spiritual
+                { name: 'محاضرة «العلم بالله»', total: 1, unit: 'درس', department: 'spiritual', type: 'video' },
+                { name: 'محاضرة «أتدري ما الله؟»', total: 1, unit: 'درس', department: 'spiritual', type: 'video' },
+                { name: 'محاضرة «السر الأعظم»', total: 1, unit: 'درس', department: 'spiritual', type: 'video' },
+                { name: 'كتاب «تفسير السعدي»', total: 17, unit: 'سورة', department: 'spiritual', type: 'read' },
+                { name: 'سلسلة «الأسماء الحسنى»', total: 20, unit: 'درس', department: 'spiritual', type: 'video' },
+                // Review
+                { name: 'مراجعة محفوظ «نظم الآجرومية»', total: 150, unit: 'بيت', department: 'review', type: 'memo' }
+            ].map((s, i) => createInitialSubject(s, i + 100));
+
+            const initialSubjectsThird = [
+                { name: 'محاضرة «كيف يرتب طالب العلم يومه»', total: 1, unit: 'محاضرة', department: 'spiritual', type: 'video' },
+                { name: 'سلسلة «الاستهداء بالقرآن»', total: 16, unit: 'درسًا', department: 'spiritual', type: 'video' },
+                { name: 'كتاب «البناء العقدي»', total: 166, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'مادة «العقيدة ضمن الحقيبة الشرعية»', total: 15, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'كتاب «قانون التأسيس العقدي»', total: 351, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'سلسلة «شرح حديث الافتراق»', total: 5, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'مادة «شرح لمعة الاعتقاد» للشيخ يوسف الغفيص', total: 1, unit: 'درس', department: 'sharia', type: 'video' },
+                { name: 'كتاب «تيسير لمعة الاعتقاد»', total: 349, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'كتاب «دلائل أصول الإسلام»', total: 504, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'كتاب «خلاصة مفاهيم أهل السنة والجماعة»', total: 210, unit: 'صفحة', department: 'sharia', type: 'read' },
+                { name: 'حفظ «ملحق المنهاج من ميراث النبوة»', total: 28, unit: 'صفحة', department: 'sharia', type: 'memo' },
+                { name: 'حفظ المجلد الأول من كتاب «الجمع بين الصحيحين»', total: 88, unit: 'صفحة', department: 'sharia', type: 'memo' },
+                { name: 'سلسلة «مركزيات الإصلاح»', total: 13, unit: 'درس', department: 'reform', type: 'video' },
+                { name: 'كتاب «بوصلة المصلح»', total: 262, unit: 'صفحة', department: 'reform', type: 'read' },
+                { name: 'كتاب «الانحرافات العقدية والعلمية في القرنين الثالث عشر والرابع عشر»', total: 625, unit: 'صفحة', department: 'reform', type: 'read' },
+                { name: 'صوتية «التحذير من ظاهرة المزايدات باسم السلف الصالح»', total: 1, unit: 'صوتية', department: 'reform', type: 'video' },
+                { name: 'كتاب «تفسير السعدي»', total: 8, unit: 'سورة', department: 'spiritual', type: 'read' },
+                { name: 'محاضرة «الشباب والسوشيال ميديا وإنجاز الأهداف»', total: 1, unit: 'محاضرة', department: 'spiritual', type: 'video' },
+                { name: 'محاضرة «حلول مقترحة لمشكلة التشتت وضعف الإرادة»', total: 1, unit: 'محاضرة', department: 'spiritual', type: 'video' },
+                { name: 'محاضرة «قواعد في تغيير النفس للأفضل»', total: 1, unit: 'محاضرة', department: 'spiritual', type: 'video' },
+                { name: 'سلسلة «زاد المصلحين»', total: 7, unit: 'درس', department: 'spiritual', type: 'video' },
+                { name: 'محفوظ كتاب عمدة الأحكام', total: 241, unit: 'صفحة', department: 'review', type: 'memo' }
+            ].map((s, i) => createInitialSubject(s, i + 200));
+
+            // --- Data Persistence ---
+            const loadData = () => {
+                let data = localStorage.getItem('progressTrackerSubjectsByStage');
+                if (!data) {
+                    allSubjects = {
+                        preparatory: initialSubjectsPreparatory.reverse(),
+                        first: [],
+                        second: initialSubjectsSecond.reverse(),
+                        third: initialSubjectsThird.reverse()
+                    };
+                    saveData();
+                } else {
+                    allSubjects = JSON.parse(data);
+                    STAGES.forEach(stage => {
+                        if (!allSubjects[stage]) {
+                            allSubjects[stage] = []; 
+                        }
+                    });
+                }
+            };
+
+            const saveData = () => {
+                localStorage.setItem('progressTrackerSubjectsByStage', JSON.stringify(allSubjects));
+            };
+            
+            const loadFilters = () => {
+                const savedFilters = localStorage.getItem('progressTrackerFiltersByStage');
+                if (savedFilters) filters = JSON.parse(savedFilters);
+            };
+            
+            const saveFilters = () => {
+                localStorage.setItem('progressTrackerFiltersByStage', JSON.stringify(filters));
+            };
+
+            const loadSortMethod = () => {
+                const savedSort = localStorage.getItem('progressTrackerSortByStage');
+                if (savedSort) sortMethod = JSON.parse(savedSort);
+            };
+            const saveSortMethod = () => {
+                localStorage.setItem('progressTrackerSortByStage', JSON.stringify(sortMethod));
+            }
+            
+            // --- Core Functions ---
+            const render = () => {
+                subjectsList.innerHTML = '';
+                
+                const currentFilters = filters[currentStage];
+                const isFilterActive = JSON.stringify(currentFilters) !== JSON.stringify(defaultFilters);
+                filterBtn.classList.toggle('active', isFilterActive);
+
+                const currentSort = sortMethod[currentStage];
+                sortBtn.classList.toggle('active', currentSort !== defaultSort);
+
+                const subjectsForStage = allSubjects[currentStage] || [];
+
+                const filteredByFilters = subjectsForStage.filter(subject => {
+                    const departmentMatch = currentFilters.departments.includes(subject.department);
+                    const typeMatch = currentFilters.types.includes(subject.type);
+                    
+                    let completionStatus;
+                    if (subject.completed >= subject.total) {
+                        completionStatus = 'completed';
+                    } else if (subject.completed === 0) {
+                        completionStatus = 'not_started';
+                    } else {
+                        completionStatus = 'in_progress';
+                    }
+                    const completionMatch = currentFilters.completion.includes(completionStatus);
+                    
+                    return departmentMatch && typeMatch && completionMatch;
+                });
+
+                const subjectsToDisplay = filteredByFilters;
+
+                subjectsToDisplay.sort((a, b) => {
+                    if (a.pinned !== b.pinned) {
+                        return a.pinned ? -1 : 1;
+                    }
+                    switch (currentSort) {
+                        case 'last_modified':
+                            return (b.lastUpdated || 0) - (a.lastUpdated || 0);
+                        case 'alphabetical':
+                        default:
+                            return a.name.localeCompare(b.name, 'ar');
+                    }
+                });
+                
+                if (subjectsToDisplay.length === 0) {
+                    let message = '';
+                    if (subjectsForStage.length === 0) {
+                        message = `<div class="empty-state"><p>لا توجد مواد في هذه المرحلة بعد.</p><p>يمكنك إضافة مادة جديدة باستخدام زر '+' في الأسفل.</p></div>`;
+                    } else {
+                         message = `<div class="empty-state"><p>لا توجد مواد تطابق معايير التصفية أو الفرز الحالية.</p></div>`;
+                    }
+                    subjectsList.innerHTML = message;
+                }
+
+                subjectsToDisplay.forEach(subject => {
+                    const percentage = subject.total > 0 ? (subject.completed / subject.total) * 100 : 0;
+                    const card = document.createElement('div');
+                    card.className = 'subject-card';
+                    card.dataset.id = subject.id;
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <h3 class="card-title">${subject.name}</h3>
+                            <div class="card-actions">
+                                 <button data-action="delete" title="حذف">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+                                 </button>
+                                <button data-action="edit" title="تعديل">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+                                </button>
+                                <button class="pin-btn ${subject.pinned ? 'pinned' : ''}" data-action="pin" title="تثبيت">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 4v5c0 1.12.37 2.16 1 3H9c.63-.84 1-1.88 1-3V4h4m3-2H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1.03 1.03L13 22v-7h5.97v-2c-1.66 0-3-1.34-3-3V4h1c.55 0 1-.45 1-1s-.45-1-1-1z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${percentage}%;"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span>${subject.completed} / ${subject.total} ${subject.unit}</span>
+                            <span>${Math.round(percentage)}%</span>
+                        </div>
+                    `;
+                    subjectsList.appendChild(card);
+                });
+                
+                updateViewUI();
+            };
+
+            const updateViewUI = () => {
+                tabsContainer.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.stage === currentStage);
+                });
+            };
+            
+            // --- Modal Management ---
+            const openModal = (modal) => modal.classList.add('visible');
+            const closeModal = (modal) => modal.classList.remove('visible');
+
+            const openAddEditModal = (mode, subjectId = null) => {
+                addEditForm.reset();
+                if (mode === 'add') {
+                    editingSubjectId = null;
+                    modalTitle.textContent = 'إضافة مادة جديدة';
+                    deleteSubjectBtn.style.display = 'none';
+                } else { // 'edit' mode
+                    editingSubjectId = subjectId;
+                    const subject = allSubjects[currentStage].find(s => s.id === subjectId);
+                    if (!subject) return;
+                    modalTitle.textContent = 'تعديل المادة';
+                    subjectNameInput.value = subject.name;
+                    subjectTotalInput.value = subject.total;
+                    subjectUnitInput.value = subject.unit;
+                    subjectDepartmentInput.value = subject.department || 'sharia';
+                    subjectTypeInput.value = subject.type || 'video';
+                    deleteSubjectBtn.style.display = 'inline-block';
+                }
+                openModal(addEditModal);
+            };
+
+            const openUpdateProgressModal = (subjectId) => {
+                editingSubjectId = subjectId;
+                const subject = allSubjects[currentStage].find(s => s.id === subjectId);
+                if (!subject) return;
+
+                updateModalTitle.textContent = `${subject.name}`;
+                progressInput.value = subject.completed;
+                progressInput.max = subject.total;
+                progressInput.min = 0;
+                progressTotalDisplay.textContent = `/ ${subject.total} ${subject.unit}`;
+                openModal(updateProgressModal);
+            };
+            
+            const openFilterModal = () => {
+                const currentFilters = filters[currentStage];
+                filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    const value = cb.value;
+                    const id = cb.id;
+
+                    if (id.startsWith('filter-dep-')) {
+                        cb.checked = currentFilters.departments.includes(value);
+                    } else if (id.startsWith('filter-type-')) {
+                        cb.checked = currentFilters.types.includes(value);
+                    } else if (id.startsWith('filter-comp-')) {
+                        cb.checked = currentFilters.completion.includes(value);
+                    }
+                });
+                openModal(filterModal);
+            };
+
+            const openSortModal = () => {
+                const currentSort = sortMethod[currentStage];
+                const radioToCheck = sortForm.querySelector(`input[value="${currentSort}"]`);
+                if (radioToCheck) {
+                    radioToCheck.checked = true;
+                }
+                openModal(sortModal);
+            };
+
+            // --- Event Handlers ---
+
+            tabsContainer.addEventListener('click', (e) => {
+                const tab = e.target.closest('.tab-btn');
+                if (tab && tab.dataset.stage) {
+                    currentStage = tab.dataset.stage;
+                    render();
+                }
+            });
+            addSubjectBtn.addEventListener('click', () => openAddEditModal('add'));
+            filterBtn.addEventListener('click', openFilterModal);
+            sortBtn.addEventListener('click', openSortModal);
+            copyBtn.addEventListener('click', () => openModal(copyModal));
+
+            subjectsList.addEventListener('click', (e) => {
+                const card = e.target.closest('.subject-card');
+                if (!card) return;
+                
+                const subjectId = Number(card.dataset.id);
+                const actionBtn = e.target.closest('button');
+                const action = actionBtn ? actionBtn.dataset.action : null;
+
+                if (action === 'edit') {
+                    openAddEditModal('edit', subjectId);
+                } else if (action === 'pin') {
+                    const subject = allSubjects[currentStage].find(s => s.id === subjectId);
+                    if (subject) {
+                        subject.pinned = !subject.pinned;
+                        saveData();
+                        render();
+                    }
+                } else if (action === 'delete') {
+                    subjectToDeleteId = subjectId;
+                    openModal(confirmModal);
+                } else {
+                    openUpdateProgressModal(subjectId);
+                }
+            });
+
+            addEditForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = subjectNameInput.value.trim();
+                const total = parseInt(subjectTotalInput.value);
+                const unit = subjectUnitInput.value.trim();
+                const department = subjectDepartmentInput.value;
+                const type = subjectTypeInput.value;
+
+                if (!name || !unit || isNaN(total) || total < 1) return;
+
+                if (editingSubjectId) {
+                    const subject = allSubjects[currentStage].find(s => s.id === editingSubjectId);
+                    if (subject) {
+                        subject.name = name;
+                        subject.total = total;
+                        subject.unit = unit;
+                        subject.department = department;
+                        subject.type = type;
+                        if (subject.completed > total) subject.completed = total;
+                    }
+                } else {
+                    const newSubject = {
+                        id: Date.now(), name, total, unit,
+                        department, type,
+                        completed: 0, pinned: false, lastUpdated: Date.now(),
+                    };
+                    allSubjects[currentStage].push(newSubject);
+                }
+                saveData();
+                render();
+                closeModal(addEditModal);
+            });
+
+            updateProgressForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const subject = allSubjects[currentStage].find(s => s.id === editingSubjectId);
+                if (subject) {
+                    const valueToParse = progressInput.value.trim() === '' ? progressInputValueBeforeFocus : progressInput.value;
+                    if (valueToParse !== null) {
+                        let newValue = parseInt(valueToParse, 10);
+                        if (!isNaN(newValue)) {
+                            if (newValue < 0) {
+                                newValue = 0;
+                            } else if (newValue > subject.total) {
+                                newValue = subject.total;
+                            }
+                            if(subject.completed !== newValue) {
+                                subject.lastUpdated = Date.now();
+                            }
+                            subject.completed = newValue;
+                            saveData();
+                            render();
+                        }
+                    }
+                }
+                closeModal(updateProgressModal);
+            });
+            
+            incrementProgressBtn.addEventListener('click', () => {
+                const currentValue = parseInt(progressInput.value);
+                const maxValue = parseInt(progressInput.max);
+                if (!isNaN(currentValue) && currentValue < maxValue) {
+                    progressInput.value = currentValue + 1;
+                }
+            });
+
+            decrementProgressBtn.addEventListener('click', () => {
+                const currentValue = parseInt(progressInput.value);
+                const minValue = parseInt(progressInput.min);
+                if (!isNaN(currentValue) && currentValue > minValue) {
+                    progressInput.value = currentValue - 1;
+                }
+            });
+            
+            progressInput.addEventListener('focus', (e) => {
+                progressInputValueBeforeFocus = e.target.value;
+                e.target.value = '';
+            });
+
+            progressInput.addEventListener('blur', (e) => {
+                if (e.target.value.trim() === '') {
+                    e.target.value = progressInputValueBeforeFocus;
+                }
+            });
+
+            progressInput.addEventListener('input', () => {
+                let value = parseInt(progressInput.value);
+                const min = parseInt(progressInput.min);
+                const max = parseInt(progressInput.max);
+
+                if (isNaN(value)) return;
+
+                if (value < min) {
+                    progressInput.value = min;
+                } else if (value > max) {
+                    progressInput.value = max;
+                }
+            });
+
+            deleteSubjectBtn.addEventListener('click', () => {
+                subjectToDeleteId = editingSubjectId;
+                openModal(confirmModal);
+            });
+            
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (subjectToDeleteId) {
+                    allSubjects[currentStage] = allSubjects[currentStage].filter(s => s.id !== subjectToDeleteId);
+                    saveData();
+                    render();
+                    subjectToDeleteId = null;
+                    closeModal(confirmModal);
+                    closeModal(addEditModal);
+                }
+            });
+
+            confirmCancelBtn.addEventListener('click', () => {
+                subjectToDeleteId = null;
+                closeModal(confirmModal);
+            });
+            
+            filterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const currentFilters = filters[currentStage];
+                currentFilters.departments = Array.from(filterForm.querySelectorAll('input[id^="filter-dep"]:checked')).map(cb => cb.value);
+                currentFilters.types = Array.from(filterForm.querySelectorAll('input[id^="filter-type"]:checked')).map(cb => cb.value);
+                currentFilters.completion = Array.from(filterForm.querySelectorAll('input[id^="filter-comp"]:checked')).map(cb => cb.value);
+                
+                saveFilters();
+                render();
+                closeModal(filterModal);
+            });
+
+            sortForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const selectedSort = sortForm.querySelector('input[name="sort-method"]:checked').value;
+                sortMethod[currentStage] = selectedSort;
+                saveSortMethod();
+                render();
+                closeModal(sortModal);
+            });
+            
+            copyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const includeCompleted = copyIncludeCompleted.checked;
+                const includeNotStarted = copyIncludeNotStarted.checked;
+
+                const subjectsToCopy = allSubjects[currentStage].filter(s => {
+                    const isCompleted = s.completed >= s.total;
+                    const isNotStarted = s.completed === 0;
+                    const isInProgress = !isCompleted && !isNotStarted;
+
+                    if (isInProgress) return true;
+                    if (isCompleted && includeCompleted) return true;
+                    if (isNotStarted && includeNotStarted) return true;
+                    
+                    return false;
+                });
+
+                const departmentMap = {
+                    sharia: 'القسم الشرعي',
+                    reform: 'قسم المنهج الإصلاحي/الثقافي',
+                    spiritual: 'القسم التزكوي',
+                    review: 'قسم المراجعة'
+                };
+                const departmentOrder = ['sharia', 'reform', 'spiritual', 'review'];
+                
+                subjectsToCopy.sort((a, b) => {
+                    const depAIndex = departmentOrder.indexOf(a.department);
+                    const depBIndex = departmentOrder.indexOf(b.department);
+
+                    if (depAIndex !== depBIndex) {
+                        return depAIndex - depBIndex;
+                    }
+                    return a.name.localeCompare(b.name, 'ar');
+                });
+                
+                let outputLines = [];
+                let currentDepartment = null;
+
+                subjectsToCopy.forEach(s => {
+                    if (s.department !== currentDepartment) {
+                        currentDepartment = s.department;
+                        if (outputLines.length > 0) outputLines.push('');
+                        outputLines.push(`--- ${departmentMap[currentDepartment] || 'قسم غير محدد'} ---`);
+                    }
+
+                    const percentage = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
+                    const line = `${s.name} (أنهيت ${s.completed} ${s.unit} من أصل ${s.total} ${s.unit} بنسبة تساوي ${percentage}%)`;
+                    outputLines.push(line);
+                });
+
+                const textToCopy = outputLines.join('\n');
+
+                if (!textToCopy) {
+                    copyToClipboardBtn.textContent = 'لا يوجد شيء للنسخ';
+                    setTimeout(() => { copyToClipboardBtn.textContent = 'نسخ'; }, 2000);
+                    return;
+                }
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    copyToClipboardBtn.textContent = 'تم النسخ!';
+                    setTimeout(() => {
+                        copyToClipboardBtn.textContent = 'نسخ';
+                        closeModal(copyModal);
+                        copyIncludeCompleted.checked = false;
+                        copyIncludeNotStarted.checked = false;
+                    }, 1500);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    copyToClipboardBtn.textContent = 'فشل النسخ!';
+                    setTimeout(() => { copyToClipboardBtn.textContent = 'نسخ'; }, 2000);
+                });
+            });
+
+            resetFiltersBtn.addEventListener('click', () => {
+                filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+            });
+            
+            deselectAllFiltersBtn.addEventListener('click', () => {
+                filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            });
+
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal || e.target.hasAttribute('data-close')) {
+                        closeModal(modal);
+                    }
+                });
+            });
+
+            // --- Mobile keyboard adjustment for modals ---
+            const setupKeyboardHandlers = (modal) => {
+                modal.addEventListener('focusin', (e) => {
+                    if (window.innerWidth <= 600 && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) {
+                        modal.classList.add('keyboard-active');
+                    }
+                });
+
+                modal.addEventListener('focusout', (e) => {
+                     if (window.innerWidth <= 600 && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) {
+                        // Use a small timeout to check if focus has moved to another element within the same modal.
+                        // If focus has left the inputs, it means the keyboard is likely closing.
+                        setTimeout(() => {
+                            const activeElement = document.activeElement;
+                            const isFocusInsideModalInputs = modal.contains(activeElement) && 
+                                                             (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT');
+
+                            if (!isFocusInsideModalInputs) {
+                                modal.classList.remove('keyboard-active');
+                            }
+                        }, 50);
+                    }
+                });
+            };
+            
+            [addEditModal, updateProgressModal].forEach(setupKeyboardHandlers);
+
+            // --- Initial Load ---
+            loadData();
+            loadFilters();
+            loadSortMethod();
+            render();
+
+            // PWA Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js').then(registration => {
+                        console.log('ServiceWorker registered with scope: ', registration.scope);
+                    }).catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
